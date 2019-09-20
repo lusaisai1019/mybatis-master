@@ -301,6 +301,7 @@ public class XNode {
     return children;
   }
 
+  //可以看到,首先将子节点的 name 以及value属性set进properties对象
   public Properties getChildrenAsProperties() {
     Properties properties = new Properties();
     for (XNode child : getChildren()) {

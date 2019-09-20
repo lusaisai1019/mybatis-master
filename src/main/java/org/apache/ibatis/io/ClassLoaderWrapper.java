@@ -86,6 +86,7 @@ public class ClassLoaderWrapper {
    * @throws ClassNotFoundException Duh.
    */
   public Class<?> classForName(String name) throws ClassNotFoundException {
+    //继续点进去
     return classForName(name, getClassLoaders(null));
   }
 
@@ -201,6 +202,7 @@ public class ClassLoaderWrapper {
 
   }
 
+  //使用类加载器
   ClassLoader[] getClassLoaders(ClassLoader classLoader) {
     return new ClassLoader[]{
         classLoader,

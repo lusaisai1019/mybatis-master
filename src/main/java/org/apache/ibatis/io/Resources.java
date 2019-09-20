@@ -257,6 +257,7 @@ public class Resources {
    * @return The loaded class
    * @throws ClassNotFoundException If the class cannot be found (duh!)
    */
+  //这个一看就是反射
   public static Class<?> classForName(String className) throws ClassNotFoundException {
     return classLoaderWrapper.classForName(className);
   }

@@ -25,7 +25,10 @@
 
     <!-- 加载mapper.xml -->
      <mappers>
-         <mapper resource="com/lusaisai/mapper/DemoMapper.xml"   ></mapper>
+         <!-- 第一种方式：通过resource指定 -->
+         <!--<mapper resource="com/lusaisai/mapper/DemoMapper.xml"   ></mapper>-->
+          <!--第二种方式，直接指定包，自动扫描-->
+            <package name="com.lusaisai.mapper"/>
      </mappers>
 
 </configuration>

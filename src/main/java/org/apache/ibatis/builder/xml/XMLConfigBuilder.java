@@ -47,6 +47,7 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.type.JdbcType;
 
 /**
+ * mybatis 配置文件解析
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */
@@ -77,7 +78,9 @@ public class XMLConfigBuilder extends BaseBuilder {
     this(inputStream, environment, null);
   }
 
+  //进入这个构造方法
   public XMLConfigBuilder(InputStream inputStream, String environment, Properties props) {
+    //注意这里validation为true,environment和props为null
     this(new XPathParser(inputStream, true, props, new XMLMapperEntityResolver()), environment, props);
   }
 
@@ -90,18 +93,22 @@ public class XMLConfigBuilder extends BaseBuilder {
     this.parser = parser;
   }
 
+  //外部调用此方法对mybatis配置文件进行解析
   public Configuration parse() {
     if (parsed) {
       throw new BuilderException("Each XMLConfigBuilder can only be used once.");
     }
     parsed = true;
+    //从根节点configuration
     parseConfiguration(parser.evalNode("/configuration"));
     return configuration;
   }
 
+  //此方法就是解析configuration节点下的子节点
   private void parseConfiguration(XNode root) {
     try {
-      //issue #117 read properties first
+      //issue #117 read properties first,这里先读取properties标签,也就是数据库配置
+      //我们在configuration下面能配置的节点为以下10个节点
       propertiesElement(root.evalNode("properties"));
       Properties settings = settingsAsProperties(root.evalNode("settings"));
       loadCustomVfs(settings);
@@ -218,24 +225,35 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  //下面就看看解析properties的具体方法
   private void propertiesElement(XNode context) throws Exception {
     if (context != null) {
+      //我们没有在properties标签下直接配置name和value,可以跳过这行
       Properties defaults = context.getChildrenAsProperties();
+      //获取properties节点上 resource属性的值,这个就是我们用的配置
       String resource = context.getStringAttribute("resource");
+      //这里可以看到properties标签也可以配置url
       String url = context.getStringAttribute("url");
+      //这里说明同时配置resource和url会抛异常,所以我们只配置一个就可以了
       if (resource != null && url != null) {
         throw new BuilderException("The properties element cannot specify both a URL and a resource based property file reference.  Please specify one or the other.");
       }
+      //把解析出的properties文件set进Properties对象
       if (resource != null) {
+        //这里点进去就是jdk的方法了,这里只要知道解析成key-value形式就好了
         defaults.putAll(Resources.getResourceAsProperties(resource));
       } else if (url != null) {
         defaults.putAll(Resources.getUrlAsProperties(url));
       }
+      //configuration这个对象会装载所解析mybatis配置文件的所有节点元素，以后也会频频提到这个对象
+      //将configuration对象中已配置的Properties属性与刚刚解析的融合
       Properties vars = configuration.getVariables();
       if (vars != null) {
         defaults.putAll(vars);
       }
+      //这就是一个set方法,把装有解析配置propertis对象set进解析器,后面可能会用到
       parser.setVariables(defaults);
+      //这也是一个set方法,将解析结果set进configuration对象
       configuration.setVariables(defaults);
     }
   }
@@ -269,15 +287,21 @@ public class XMLConfigBuilder extends BaseBuilder {
     configuration.setConfigurationFactory(resolveClass(props.getProperty("configurationFactory")));
   }
 
+  //再看看解析enviroments元素节点的方法
   private void environmentsElement(XNode context) throws Exception {
     if (context != null) {
       if (environment == null) {
+        //解析environments节点上default属性的值
         environment = context.getStringAttribute("default");
       }
+      //遍历解析environments子节点
       for (XNode child : context.getChildren()) {
+        // <environment id="development">,意思就是我们可以对应多个环境，比如开发环境，测试环境等， 由environments的default属性去选择对应的enviroment
         String id = child.getStringAttribute("id");
         if (isSpecifiedEnvironment(id)) {
+          //事务， mybatis有两种：JDBC 和 MANAGED, 配置为JDBC则直接使用JDBC的事务,另一个没用过,不谈
           TransactionFactory txFactory = transactionManagerElement(child.evalNode("transactionManager"));
+          //enviroment节点下面就是dataSource节点了，解析dataSource节点
           DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
           DataSource dataSource = dsFactory.getDataSource();
           Environment.Builder environmentBuilder = new Environment.Builder(id)
@@ -319,10 +343,14 @@ public class XMLConfigBuilder extends BaseBuilder {
     throw new BuilderException("Environment declaration requires a TransactionFactory.");
   }
 
+  //下面看看dataSource的解析方法
   private DataSourceFactory dataSourceElement(XNode context) throws Exception {
     if (context != null) {
+      //dataSource的连接池,我们选的是jdbc
       String type = context.getStringAttribute("type");
+      //子节点 name, value属性set进一个properties对象
       Properties props = context.getChildrenAsProperties();
+      //利用反射创建dataSourceFactory
       DataSourceFactory factory = (DataSourceFactory) resolveClass(type).getDeclaredConstructor().newInstance();
       factory.setProperties(props);
       return factory;
@@ -356,6 +384,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       }
     }
   }
+
 
   private void mapperElement(XNode parent) throws Exception {
     if (parent != null) {

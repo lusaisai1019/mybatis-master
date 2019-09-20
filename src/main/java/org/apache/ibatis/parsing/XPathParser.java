@@ -122,7 +122,9 @@ public class XPathParser {
     this.document = createDocument(new InputSource(reader));
   }
 
+  //看这个名字,应该是xml解析器,validation为true ,variables为null,EntityResolver是用于解析实体类的解析器
   public XPathParser(InputStream inputStream, boolean validation, Properties variables, EntityResolver entityResolver) {
+
     commonConstructor(validation, variables, entityResolver);
     this.document = createDocument(new InputSource(inputStream));
   }
@@ -131,6 +133,7 @@ public class XPathParser {
     commonConstructor(validation, variables, entityResolver);
     this.document = document;
   }
+
 
   public void setVariables(Properties variables) {
     this.variables = variables;
@@ -227,6 +230,7 @@ public class XPathParser {
     }
   }
 
+  //这个方法来将DOM加载到XPathParser中
   private Document createDocument(InputSource inputSource) {
     // important: this must only be called AFTER common constructor
     try {
@@ -264,11 +268,14 @@ public class XPathParser {
     }
   }
 
+  //这里validation为true,variables为null
   private void commonConstructor(boolean validation, Properties variables, EntityResolver entityResolver) {
     this.validation = validation;
     this.entityResolver = entityResolver;
     this.variables = variables;
+    //这里的XPathFactory是jdk自带的xml解析器
     XPathFactory factory = XPathFactory.newInstance();
+    //返回一个xpath对象,也是JDK自带的类,用于来解析XML文件
     this.xpath = factory.newXPath();
   }
 

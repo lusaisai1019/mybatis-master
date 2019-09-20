@@ -32,6 +32,9 @@ import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
  */
 public class SqlSessionFactoryBuilder {
 
+  //Reader读取mybatis配置文件，传入构造方法
+  //除了Reader外，其实还有对应的inputStream作为参数的构造方法，
+   //这也体现了mybatis配置的灵活性
   public SqlSessionFactory build(Reader reader) {
     return build(reader, null, null);
   }
@@ -40,13 +43,16 @@ public class SqlSessionFactoryBuilder {
     return build(reader, environment, null);
   }
 
+  //mybatis配置文件 + properties, 此时mybatis配置文件中可以不配置properties，也能使用${}形式
   public SqlSessionFactory build(Reader reader, Properties properties) {
     return build(reader, null, properties);
   }
 
+  //通过XMLConfigBuilder解析mybatis配置，然后创建SqlSessionFactory对象
   public SqlSessionFactory build(Reader reader, String environment, Properties properties) {
     try {
       XMLConfigBuilder parser = new XMLConfigBuilder(reader, environment, properties);
+      //下面看看这个方法的源码
       return build(parser.parse());
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error building SqlSession.", e);
@@ -60,7 +66,9 @@ public class SqlSessionFactoryBuilder {
     }
   }
 
+  //这个方法啥都没有,我们继续点进去
   public SqlSessionFactory build(InputStream inputStream) {
+    //这是一个重载方法,environment和Properties均传入空
     return build(inputStream, null, null);
   }
 
@@ -72,8 +80,10 @@ public class SqlSessionFactoryBuilder {
     return build(inputStream, null, properties);
   }
 
+  //就是这个重载方法,注意后面两个参数均为空
   public SqlSessionFactory build(InputStream inputStream, String environment, Properties properties) {
     try {
+      //XMLConfigBuilder是对mybatis的配置文件进行解析的类，会对mybatis配置文件解析
       XMLConfigBuilder parser = new XMLConfigBuilder(inputStream, environment, properties);
       return build(parser.parse());
     } catch (Exception e) {
