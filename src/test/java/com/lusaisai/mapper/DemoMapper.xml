@@ -25,6 +25,13 @@
     </insert>
 
 
+    <resultMap id="" type="" >
+        <result javaType="" column="" property=""></result>
+        <collection property="" ofType="" >
+
+        </collection>
+
+    </resultMap>
     <!--查询单条信息-->
     <select  id="selectOne"    resultType="com.lusaisai.po.DeptInfo" >
         SELECT * FROM dept WHERE DEPTNO=#{deptNum} AND DNAME LIKE CONCAT('%',#{dName},'%')

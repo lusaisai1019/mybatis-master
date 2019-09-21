@@ -89,9 +89,11 @@ public class XMLMapperBuilder extends BaseBuilder {
     this.resource = resource;
   }
 
-  //
+  //解析mapper标签的子标签mapper
   public void parse() {
+    //判断 <mapper resource="com/lusaisai/mapper/DemoMapper.xml"   ></mapper> 的resource是否解析过,如果没有解析过,进if
     if (!configuration.isResourceLoaded(resource)) {
+      //解析com/lusaisai/mapper/DemoMapper.xml,点进去看下
       configurationElement(parser.evalNode("/mapper"));
       configuration.addLoadedResource(resource);
       bindMapperForNamespace();
@@ -106,19 +108,21 @@ public class XMLMapperBuilder extends BaseBuilder {
     return sqlFragments.get(refid);
   }
 
+  //解析com/lusaisai/mapper/DemoMapper.xml 方法
   private void configurationElement(XNode context) {
     try {
+      //解析命名空间
       String namespace = context.getStringAttribute("namespace");
       if (namespace == null || namespace.equals("")) {
         throw new BuilderException("Mapper's namespace cannot be empty");
       }
       builderAssistant.setCurrentNamespace(namespace);
-      cacheRefElement(context.evalNode("cache-ref"));
+      cacheRefElement(context.evalNode("cache-ref"));//解析缓存标签
       cacheElement(context.evalNode("cache"));
       parameterMapElement(context.evalNodes("/mapper/parameterMap"));
-      resultMapElements(context.evalNodes("/mapper/resultMap"));
+      resultMapElements(context.evalNodes("/mapper/resultMap"));//解析resultMap标签
       sqlElement(context.evalNodes("/mapper/sql"));
-      buildStatementFromContext(context.evalNodes("select|insert|update|delete"));
+      buildStatementFromContext(context.evalNodes("select|insert|update|delete"));//这里四种标签一起解析,所以效果一样
     } catch (Exception e) {
       throw new BuilderException("Error parsing Mapper XML. The XML location is '" + resource + "'. Cause: " + e, e);
     }
@@ -240,6 +244,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
   }
 
+  //解析resultMap标签
   private void resultMapElements(List<XNode> list) throws Exception {
     for (XNode resultMapNode : list) {
       try {
@@ -254,8 +259,25 @@ public class XMLMapperBuilder extends BaseBuilder {
     return resultMapElement(resultMapNode, Collections.emptyList(), null);
   }
 
+  /*
+    <resultMap id="accountUserMap" type="account">
+      <id property="id" column="aid"></id>
+      <result property="uid" column="uid"></result>
+      <result property="money" column="money"></result>
+      <!-- 一对一的关系映射：配置封装user的内容-->
+      <association property="user" column="uid" javaType="user">
+          <id property="id" column="id"></id>
+          <result column="username" property="username"></result>
+          <result column="address" property="address"></result>
+          <result column="sex" property="sex"></result>
+          <result column="birthday" property="birthday"></result>
+      </association>
+    </resultMap>
+  */
+  //解析resultMap标签
   private ResultMap resultMapElement(XNode resultMapNode, List<ResultMapping> additionalResultMappings, Class<?> enclosingType) throws Exception {
     ErrorContext.instance().activity("processing " + resultMapNode.getValueBasedIdentifier());
+    //解析type标签
     String type = resultMapNode.getStringAttribute("type",
         resultMapNode.getStringAttribute("ofType",
             resultMapNode.getStringAttribute("resultType",

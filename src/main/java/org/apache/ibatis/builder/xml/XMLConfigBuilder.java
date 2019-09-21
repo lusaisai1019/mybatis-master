@@ -116,17 +116,17 @@ public class XMLConfigBuilder extends BaseBuilder {
       Properties settings = settingsAsProperties(root.evalNode("settings"));
       loadCustomVfs(settings);
       loadCustomLogImpl(settings);
-      typeAliasesElement(root.evalNode("typeAliases"));
-      pluginElement(root.evalNode("plugins"));
+      typeAliasesElement(root.evalNode("typeAliases"));//解析别名,点进去看下
+      pluginElement(root.evalNode("plugins"));//解析插件
       objectFactoryElement(root.evalNode("objectFactory"));
       objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
       reflectorFactoryElement(root.evalNode("reflectorFactory"));
       settingsElement(settings);
       // read it after objectFactory and objectWrapperFactory issue #631
-      environmentsElement(root.evalNode("environments"));
+      environmentsElement(root.evalNode("environments"));//解析jdbc信息
       databaseIdProviderElement(root.evalNode("databaseIdProvider"));
       typeHandlerElement(root.evalNode("typeHandlers"));
-      mapperElement(root.evalNode("mappers"));
+      mapperElement(root.evalNode("mappers"));//解析mapper
     } catch (Exception e) {
       throw new BuilderException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
     }
@@ -166,17 +166,27 @@ public class XMLConfigBuilder extends BaseBuilder {
     configuration.setLogImpl(logImpl);
   }
 
+  //解析别名的方法
   private void typeAliasesElement(XNode parent) {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {
+        //批量解析
         if ("package".equals(child.getName())) {
           String typeAliasPackage = child.getStringAttribute("name");
           configuration.getTypeAliasRegistry().registerAliases(typeAliasPackage);
-        } else {
+        } else {//一个一个解析
+          /*
+              <typeAliases>
+                   <!--alias表示别名，type表示类的全路径-->
+                  <typeAlias  alias="User" type="com.tianshouzhi.mybatis.quickstart.domain.User"/>
+              </typeAliases>
+          */
           String alias = child.getStringAttribute("alias");
           String type = child.getStringAttribute("type");
           try {
+            //根据type表示的全限定名拿到它的class对象
             Class<?> clazz = Resources.classForName(type);
+            //注册别名,分两种情况,一种alias为空,一种不为空,点进去
             if (alias == null) {
               typeAliasRegistry.registerAlias(clazz);
             } else {
@@ -389,29 +399,47 @@ public class XMLConfigBuilder extends BaseBuilder {
   }
 
 
+  /*
+    <mappers>
+     <!-- 第一种方式：通过resource指定 -->
+     <mapper resource="com/lusaisai/mapper/DemoMapper.xml"   ></mapper>
+     <!--第二种方式，直接指定包，自动扫描-->
+     <!--<package name="com.lusaisai.mapper.*"/>-->
+     </mappers>
+   */
   private void mapperElement(XNode parent) throws Exception {
     if (parent != null) {
+      // 解析mapper标签
       for (XNode child : parent.getChildren()) {
+        //解析package子标签
         if ("package".equals(child.getName())) {
           String mapperPackage = child.getStringAttribute("name");
           configuration.addMappers(mapperPackage);
+          //解析mapper子标签
         } else {
+          //mapper子标签有三种配置方式
           String resource = child.getStringAttribute("resource");
           String url = child.getStringAttribute("url");
           String mapperClass = child.getStringAttribute("class");
+          //只有resource有值,其他均为空
           if (resource != null && url == null && mapperClass == null) {
             ErrorContext.instance().resource(resource);
             InputStream inputStream = Resources.getResourceAsStream(resource);
+            //解析resource标签
             XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
+            //点进去看下
             mapperParser.parse();
+            //只有url有值,其他均为空
           } else if (resource == null && url != null && mapperClass == null) {
             ErrorContext.instance().resource(url);
             InputStream inputStream = Resources.getUrlAsStream(url);
             XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, url, configuration.getSqlFragments());
             mapperParser.parse();
+            //只有mapperClass有值,其他均为空
           } else if (resource == null && url == null && mapperClass != null) {
             Class<?> mapperInterface = Resources.classForName(mapperClass);
             configuration.addMapper(mapperInterface);
+            //也就是说,只能有一个有值,否则抛异常
           } else {
             throw new BuilderException("A mapper element may only specify a url, resource or class, but not more than one.");
           }

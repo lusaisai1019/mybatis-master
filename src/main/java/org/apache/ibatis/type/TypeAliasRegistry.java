@@ -149,12 +149,16 @@ public class TypeAliasRegistry {
     }
   }
 
+  //Alias为空的注册别名方法
   public void registerAlias(Class<?> type) {
     String alias = type.getSimpleName();
+    //看下注解上面有没有
     Alias aliasAnnotation = type.getAnnotation(Alias.class);
+    //如果有注解,解析注解
     if (aliasAnnotation != null) {
       alias = aliasAnnotation.value();
     }
+    //否则,解析xml
     registerAlias(alias, type);
   }
 
@@ -164,10 +168,12 @@ public class TypeAliasRegistry {
       throw new TypeException("The parameter alias cannot be null");
     }
     // issue #748
+    //别名统一处理,都转化为小写,所以别名不区分大小写
     String key = alias.toLowerCase(Locale.ENGLISH);
     if (typeAliases.containsKey(key) && typeAliases.get(key) != null && !typeAliases.get(key).equals(value)) {
       throw new TypeException("The alias '" + alias + "' is already mapped to the value '" + typeAliases.get(key).getName() + "'.");
     }
+    //将别名存进map
     typeAliases.put(key, value);
   }
 
