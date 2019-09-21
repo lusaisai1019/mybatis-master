@@ -1,5 +1,5 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -80,17 +80,21 @@ public class SqlSessionFactoryBuilder {
     return build(inputStream, null, properties);
   }
 
-  //就是这个重载方法,注意后面两个参数均为空
+  //就是这个方法,注意后面两个参数均为空
   public SqlSessionFactory build(InputStream inputStream, String environment, Properties properties) {
     try {
-      //XMLConfigBuilder是对mybatis的配置文件进行解析的类，会对mybatis配置文件解析
+      //XMLConfigBuilder看这个名字就是对mybatis的配置文件进行解析的类,现在他还是一个初始化对象,没有开始解析
       XMLConfigBuilder parser = new XMLConfigBuilder(inputStream, environment, properties);
+      //这个就是读取方法,parser.parse()返回一个Configuration对象,该对象将存放读取配置文件的信息
+      //build(parser.parse())传入一个Configuration对象,并使用多态返回SqlSessionFactory接口的实体类DefaultSqlSessionFactory
+      //DefaultSqlSessionFactory只有一个属性,就是Configuration对象
       return build(parser.parse());
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error building SqlSession.", e);
     } finally {
       ErrorContext.instance().reset();
       try {
+        //这里关闭了读取流inputStream,我们不用再手动关闭了
         inputStream.close();
       } catch (IOException e) {
         // Intentionally ignore. Prefer previous error.
@@ -98,7 +102,10 @@ public class SqlSessionFactoryBuilder {
     }
   }
 
+  //这里就是返回SqlSessionFactory方法
   public SqlSessionFactory build(Configuration config) {
+    //DefaultSqlSessionFactory就是SqlSessionFactory接口的实现类,
+    //这个类只有一个属性,就是Configuration对象,Configuration对象就是刚刚获取的用来存放读取xml配置的信息
     return new DefaultSqlSessionFactory(config);
   }
 

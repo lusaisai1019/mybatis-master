@@ -1,5 +1,5 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -107,18 +107,25 @@ public class ParamNameResolver {
    * ...).
    * </p>
    */
+  //这里args就是我们传的参数10和T
   public Object getNamedParams(Object[] args) {
+    //这里names对象是一个map类型,key从0开始根据sql语句的参数增加,sql语句有两个参数,deptNum和dName
     final int paramCount = names.size();
     if (args == null || paramCount == 0) {
       return null;
+      // 未使用@Param注解且参数列表只有一个,我们的查询语句不符合这个条件
     } else if (!hasParamAnnotation && paramCount == 1) {
       return args[names.firstKey()];
     } else {
+      //new一个新的map
       final Map<String, Object> param = new ParamMap<>();
       int i = 0;
+      //遍历names
       for (Map.Entry<Integer, String> entry : names.entrySet()) {
+        //把names对象的Value作为key,我们实际传的参数作为value传入新map中
         param.put(entry.getValue(), args[entry.getKey()]);
         // add generic param names (param1, param2, ...)
+        //GENERIC_NAME_PREFIX是一个常数字符串param,它拼接i形成新字符串(param1, param2, ...)
         final String genericParamName = GENERIC_NAME_PREFIX + String.valueOf(i + 1);
         // ensure not to overwrite parameter named with @Param
         if (!names.containsValue(genericParamName)) {

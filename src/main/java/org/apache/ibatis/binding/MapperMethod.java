@@ -1,5 +1,5 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -54,8 +54,10 @@ public class MapperMethod {
     this.method = new MethodSignature(config, mapperInterface, method);
   }
 
+  //就是这个执行方法
   public Object execute(SqlSession sqlSession, Object[] args) {
     Object result;
+    //command.getType()此时是select
     switch (command.getType()) {
       case INSERT: {
         Object param = method.convertArgsToSqlCommandParam(args);
@@ -72,18 +74,27 @@ public class MapperMethod {
         result = rowCountResult(sqlSession.delete(command.getName(), param));
         break;
       }
+      //进入这个分支
       case SELECT:
+        //这里结果为false,不进这里
         if (method.returnsVoid() && method.hasResultHandler()) {
           executeWithResultHandler(sqlSession, args);
           result = null;
+          //这里结果为false,不进这里
         } else if (method.returnsMany()) {
           result = executeForMany(sqlSession, args);
+          //这里结果为false,不进这里
         } else if (method.returnsMap()) {
           result = executeForMap(sqlSession, args);
+          //这里结果为false,不进这里
         } else if (method.returnsCursor()) {
           result = executeForCursor(sqlSession, args);
         } else {
+          //进这个方法,处理一下参数
           Object param = method.convertArgsToSqlCommandParam(args);
+          //处理参数完成后后param是hashmap类型,key有两种,一种是#{}里面的参数名,
+          // 另一种是(param1, param2, ...),value只有一种,就是我们的实际参数
+          //这里执行sql得到查询结果result,跟进去看下
           result = sqlSession.selectOne(command.getName(), param);
           if (method.returnsOptional()
               && (result == null || !method.getReturnType().equals(result.getClass()))) {

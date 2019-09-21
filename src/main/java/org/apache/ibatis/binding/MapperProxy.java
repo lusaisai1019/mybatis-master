@@ -1,5 +1,5 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -74,11 +74,15 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
     lookupConstructor = lookup;
   }
 
+  //这里method是接口DemoMapper的selectOne方法
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     try {
+      // 如果目标方法是Object类继承来的，直接调用目标方法
+      //method.getDeclaringClass()是接口DemoMapper的类对象,这里结果为false,跳过这一步
       if (Object.class.equals(method.getDeclaringClass())) {
         return method.invoke(this, args);
+        //这里method是接口DemoMapper的selectOne方法,所以结果也为false,跳过这一步
       } else if (method.isDefault()) {
         if (privateLookupInMethod == null) {
           return invokeDefaultMethodJava8(proxy, method, args);
@@ -89,7 +93,10 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
     } catch (Throwable t) {
       throw ExceptionUtil.unwrapThrowable(t);
     }
+    //这里将method放入缓存
+    // 从缓存中获取MapperMethod 对象,如果没有就创建新的并添加
     final MapperMethod mapperMethod = cachedMapperMethod(method);
+    //这是真正的执行方法
     return mapperMethod.execute(sqlSession, args);
   }
 

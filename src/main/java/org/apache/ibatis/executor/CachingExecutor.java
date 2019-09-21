@@ -1,5 +1,5 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -72,14 +72,19 @@ public class CachingExecutor implements Executor {
 
   @Override
   public int update(MappedStatement ms, Object parameterObject) throws SQLException {
+    //这里做了缓存处理,无返回值,略过不看
     flushCacheIfRequired(ms);
+    //这里应该是执行方法了
     return delegate.update(ms, parameterObject);
   }
 
+  //执行语句这个方法,跟进去看下
   @Override
   public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException {
+    //
     BoundSql boundSql = ms.getBoundSql(parameterObject);
     CacheKey key = createCacheKey(ms, parameterObject, rowBounds, boundSql);
+    //这个跟进去看戏,应该是真正的jdbc操作了
     return query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
   }
 
@@ -106,6 +111,7 @@ public class CachingExecutor implements Executor {
         return list;
       }
     }
+    //跟进去
     return delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
   }
 

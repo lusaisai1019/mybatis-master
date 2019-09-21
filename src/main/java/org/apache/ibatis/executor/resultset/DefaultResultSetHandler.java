@@ -1,5 +1,5 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -192,6 +192,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     while (rsw != null && resultMapCount > resultSetCount) {
       ResultMap resultMap = resultMaps.get(resultSetCount);
       handleResultSet(rsw, resultMap, multipleResults, null);
+      //这里已经执行完sql,生成结果集了
       rsw = getNextResultSet(stmt);
       cleanUpAfterHandlingResultSet();
       resultSetCount++;
@@ -255,6 +256,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     try {
       if (stmt.getConnection().getMetaData().supportsMultipleResultSets()) {
         // Crazy Standard JDBC way of determining if there are more results
+        //这里的stmt已经包含可执行的sql了
         if (!(!stmt.getMoreResults() && stmt.getUpdateCount() == -1)) {
           ResultSet rs = stmt.getResultSet();
           if (rs == null) {

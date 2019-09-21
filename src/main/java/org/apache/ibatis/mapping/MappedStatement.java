@@ -1,5 +1,5 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -294,6 +294,7 @@ public final class MappedStatement {
   }
 
   public BoundSql getBoundSql(Object parameterObject) {
+    //这里的boundSql对象里有sql语句,参数名和实际参数
     BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
     List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
     if (parameterMappings == null || parameterMappings.isEmpty()) {

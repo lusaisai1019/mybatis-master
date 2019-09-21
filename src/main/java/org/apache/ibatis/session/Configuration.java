@@ -1,5 +1,5 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -395,6 +395,7 @@ public class Configuration {
     this.useGeneratedKeys = useGeneratedKeys;
   }
 
+  //这个是执行器类型对象
   public ExecutorType getDefaultExecutorType() {
     return defaultExecutorType;
   }
@@ -744,12 +745,16 @@ public class Configuration {
     return incompleteMethods;
   }
 
+  //进入这个方法
   public MappedStatement getMappedStatement(String id) {
     return this.getMappedStatement(id, true);
   }
 
+  //这里的id是com.lusaisai.dao.DemoMapper.selectOne 就是根据方法名作为id查找mapper.xml里面的唯一sql语句
   public MappedStatement getMappedStatement(String id, boolean validateIncompleteStatements) {
+    //validateIncompleteStatements为true,跟进去看下
     if (validateIncompleteStatements) {
+      //这里跟进去,什么都没执行
       buildAllStatements();
     }
     return mappedStatements.get(id);

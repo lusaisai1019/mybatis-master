@@ -1,5 +1,5 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -42,8 +42,10 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
     this.configuration = configuration;
   }
 
+  //openSession()
   @Override
   public SqlSession openSession() {
+    //将Configuration对象传入
     return openSessionFromDataSource(configuration.getDefaultExecutorType(), null, false);
   }
 
@@ -87,12 +89,18 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
     return configuration;
   }
 
+  //进这个方法
   private SqlSession openSessionFromDataSource(ExecutorType execType, TransactionIsolationLevel level, boolean autoCommit) {
+    //这个是事务处理器
     Transaction tx = null;
     try {
+      //获取mybatis的Environment标签里的配置信息
       final Environment environment = configuration.getEnvironment();
+      //这个看名字是事务工厂
       final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
+      //读取配置文件信息并交给事务管理器
       tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
+      //读取配置文件,生成一个执行器对象
       final Executor executor = configuration.newExecutor(tx, execType);
       return new DefaultSqlSession(configuration, executor, autoCommit);
     } catch (Exception e) {

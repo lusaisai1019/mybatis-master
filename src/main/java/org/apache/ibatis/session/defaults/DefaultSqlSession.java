@@ -1,5 +1,5 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -70,9 +70,12 @@ public class DefaultSqlSession implements SqlSession {
     return this.selectOne(statement, null);
   }
 
+  //这里statement为com.lusaisai.dao.DemoMapper.selectOne
+  //parameter就是传来的params
   @Override
   public <T> T selectOne(String statement, Object parameter) {
     // Popular vote was to return null on 0 results and throw exception on too many.
+    //这里进去看下,
     List<T> list = this.selectList(statement, parameter);
     if (list.size() == 1) {
       return list.get(0);
@@ -135,15 +138,21 @@ public class DefaultSqlSession implements SqlSession {
     return this.selectList(statement, null);
   }
 
+  //又是封装方法,别着急,继续点进去看
   @Override
   public <E> List<E> selectList(String statement, Object parameter) {
     return this.selectList(statement, parameter, RowBounds.DEFAULT);
   }
 
+  //这个是真正的sql执行方法了,statement是具体的方法名com.lusaisai.dao.DemoMapper.selectOne
+  //parameter是参数名和真是的参数
   @Override
   public <E> List<E> selectList(String statement, Object parameter, RowBounds rowBounds) {
     try {
+      //configuration对象根据statement,得到关于sql语句的相关信息
+      //这里得到的ms包含sql语句
       MappedStatement ms = configuration.getMappedStatement(statement);
+      //这里就是执行sql语句
       return executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error querying database.  Cause: " + e, e);
@@ -179,8 +188,10 @@ public class DefaultSqlSession implements SqlSession {
     return insert(statement, null);
   }
 
+  //就是这个方法
   @Override
   public int insert(String statement, Object parameter) {
+    //将sql语句的id和参数传入
     return update(statement, parameter);
   }
 
@@ -189,11 +200,15 @@ public class DefaultSqlSession implements SqlSession {
     return update(statement, null);
   }
 
+
   @Override
   public int update(String statement, Object parameter) {
     try {
+      //将默认的false改为true
       dirty = true;
+      //statement参数就是要调用的sql的id,这里的解析过程就不看了
       MappedStatement ms = configuration.getMappedStatement(statement);
+      //ms对象有两个重要属性:sqlSource是用来存sql语句的,id是com.lusaisai.dao.DemoMapper.insertDept方法名
       return executor.update(ms, wrapCollection(parameter));
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error updating database.  Cause: " + e, e);
@@ -316,6 +331,7 @@ public class DefaultSqlSession implements SqlSession {
     return (!autoCommit && dirty) || force;
   }
 
+  //这里判断参数是什么类型,我们是string类型
   private Object wrapCollection(final Object object) {
     if (object instanceof Collection) {
       StrictMap<Object> map = new StrictMap<>();

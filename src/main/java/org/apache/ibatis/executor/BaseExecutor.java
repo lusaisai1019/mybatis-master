@@ -1,5 +1,5 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -109,11 +109,14 @@ public abstract class BaseExecutor implements Executor {
 
   @Override
   public int update(MappedStatement ms, Object parameter) throws SQLException {
+    //ErrorContext对象是mybatis用于日志管理的,先不看的六个存储异常信息
     ErrorContext.instance().resource(ms.getResource()).activity("executing an update").object(ms.getId());
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
+    //清下缓存
     clearLocalCache();
+    //还要进这个方法
     return doUpdate(ms, parameter);
   }
 
@@ -319,8 +322,10 @@ public abstract class BaseExecutor implements Executor {
 
   private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
     List<E> list;
+    //key值就是待执行的sql
     localCache.putObject(key, EXECUTION_PLACEHOLDER);
     try {
+      //跟进去
       list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);
     } finally {
       localCache.removeObject(key);

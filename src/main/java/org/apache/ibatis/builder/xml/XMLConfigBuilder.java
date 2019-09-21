@@ -1,5 +1,5 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -95,12 +95,15 @@ public class XMLConfigBuilder extends BaseBuilder {
 
   //外部调用此方法对mybatis配置文件进行解析
   public Configuration parse() {
+    //parsed默认为false,配置文件只读取一次,如果为true,读取多次的时候就抛一个异常
     if (parsed) {
       throw new BuilderException("Each XMLConfigBuilder can only be used once.");
     }
+    //在这里将parsed的值改为true
     parsed = true;
-    //从根节点configuration
+    //从配置文件configuration标签开始解析,具体解析过程就不看了
     parseConfiguration(parser.evalNode("/configuration"));
+    //返回Configuration对象用于存储mybatis配置文件信息
     return configuration;
   }
 

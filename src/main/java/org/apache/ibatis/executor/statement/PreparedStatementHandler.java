@@ -1,5 +1,5 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -41,8 +41,10 @@ public class PreparedStatementHandler extends BaseStatementHandler {
     super(executor, mappedStatement, parameter, rowBounds, resultHandler, boundSql);
   }
 
+  //哇
   @Override
   public int update(Statement statement) throws SQLException {
+    //首先强转成PreparedStatement预编译对象
     PreparedStatement ps = (PreparedStatement) statement;
     ps.execute();
     int rows = ps.getUpdateCount();
@@ -60,6 +62,7 @@ public class PreparedStatementHandler extends BaseStatementHandler {
 
   @Override
   public <E> List<E> query(Statement statement, ResultHandler resultHandler) throws SQLException {
+    //这里强转成预编译对象PreparedStatement
     PreparedStatement ps = (PreparedStatement) statement;
     ps.execute();
     return resultSetHandler.handleResultSets(ps);

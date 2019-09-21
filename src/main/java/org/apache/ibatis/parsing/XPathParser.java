@@ -1,5 +1,5 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -45,11 +45,15 @@ import org.xml.sax.SAXParseException;
  * @author Kazuki Shimizu
  */
 public class XPathParser {
-
+  //Document对象是jdk自带的,用于解析xml文件
   private final Document document;
+  //是否开启验证
   private boolean validation;
+  //用于加载本地D T D 文件
   private EntityResolver entityResolver;
+  //mybatis.xml 中＜propteries＞ 标签定义的键位对集合
   private Properties variables;
+  //XPath 对象是jdk自带的,用于解析xml文件
   private XPath xpath;
 
   public XPathParser(String xml) {
@@ -118,7 +122,9 @@ public class XPathParser {
   }
 
   public XPathParser(Reader reader, boolean validation, Properties variables, EntityResolver entityResolver) {
+    //创建一个xml解析器
     commonConstructor(validation, variables, entityResolver);
+    //返回一个空的document对象
     this.document = createDocument(new InputSource(reader));
   }
 

@@ -1,5 +1,5 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -42,9 +42,11 @@ public class SimpleExecutor extends BaseExecutor {
 
   @Override
   public int doUpdate(MappedStatement ms, Object parameter) throws SQLException {
+    //这是jdk自带的Statement对象
     Statement stmt = null;
     try {
       Configuration configuration = ms.getConfiguration();
+      //handler是Statement对象的处理器
       StatementHandler handler = configuration.newStatementHandler(this, ms, parameter, RowBounds.DEFAULT, null, null);
       stmt = prepareStatement(handler, ms.getStatementLog());
       return handler.update(stmt);
