@@ -24,6 +24,20 @@
 
     <!-- 指定properties配置文件， 我这里面配置的是数据库相关 -->
     <properties resource="db.properties"></properties>
+    
+    <settings>
+        <!-- 该配置影响的所有映射器中配置的缓存的全局开关。默认值true -->
+        <setting name="cacheEnabled" value="true"/>
+        <!--  配置默认的执行器。SIMPLE 就是普通的执行器；
+        REUSE 执行器会重用预处理语句（prepared statements）； BATCH 执行器将重用语句并执行批量更新。默认SIMPLE  -->
+        <setting name="defaultExecutorType" value="SIMPLE"/>
+    </settings>
+
+    <!--别名-->
+    <typeAliases>
+        <typeAlias type="com.lusaisai.po.DeptInfo" alias="deptInfo"></typeAlias>
+    </typeAliases>
+
 
     <!-- 和spring整合后mybatis的 environments配置将废除 -->
     <environments default="development">
@@ -45,7 +59,7 @@
          <!-- 第一种方式：通过resource指定 -->
          <mapper resource="com/lusaisai/mapper/DemoMapper.xml"   ></mapper>
           <!--第二种方式，直接指定包，自动扫描-->
-            <!--<package name="com.lusaisai.mapper.*"/>-->
+        <!--<package name="com.lusaisai.mapper.*"/>-->
      </mappers>
 
 </configuration>

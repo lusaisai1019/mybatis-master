@@ -41,6 +41,7 @@ public class SqlSourceBuilder extends BaseBuilder {
 
   public SqlSource parse(String originalSql, Class<?> parameterType, Map<String, Object> additionalParameters) {
     ParameterMappingTokenHandler handler = new ParameterMappingTokenHandler(configuration, parameterType, additionalParameters);
+    //INSERT INTO dept(DNAME) VALUES (#{dName})  将#{和}里的参数替换为占位符?
     GenericTokenParser parser = new GenericTokenParser("#{", "}", handler);
     String sql = parser.parse(originalSql);
     return new StaticSqlSource(configuration, sql, handler.getParameterMappings());
@@ -62,6 +63,7 @@ public class SqlSourceBuilder extends BaseBuilder {
       return parameterMappings;
     }
 
+    //找到了,这里将#{} 替换为?
     @Override
     public String handleToken(String content) {
       parameterMappings.add(buildParameterMapping(content));

@@ -25,8 +25,6 @@ public interface DemoMapper {
 
   Integer insertDept(@Param("dName")String dName);
 
-  List<ProjInfo>  selectAll(@Param("projId")String projId, @Param("sectionName")String sectionName);
-
   DeptInfo selectOne(@Param("deptNum")Integer deptNum, @Param("dName")String dName);
 
 

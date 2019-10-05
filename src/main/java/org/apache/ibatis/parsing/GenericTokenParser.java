@@ -30,6 +30,7 @@ public class GenericTokenParser {
     this.handler = handler;
   }
 
+  //这个就是替换成占位符的方法
   public String parse(String text) {
     if (text == null || text.isEmpty()) {
       return "";

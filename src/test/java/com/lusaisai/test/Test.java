@@ -41,25 +41,30 @@ public class Test {
     //返回的DefaultSqlSession是SqlSession接口的实现类
     SqlSession sqlSession = sqlSessionFactory.openSession();
     String dName="test";
-    //sqlSession执行添加操作
-    Integer integer = sqlSession.insert("insertDept",dName);
-    System.out.println(integer);
-    //加入commit语句，手动执行提交事件，将数据提交到数据库中，才真正成功插入到数据库中,否则会回滚
-    sqlSession.commit();
-    sqlSession.close();
 
+
+    //sqlSession执行添加操作
+    //Integer integer = sqlSession.insert("insertDept",dName);
+    //System.out.println(integer);
+    //加入commit语句，手动执行提交事件，将数据提交到数据库中，才真正成功插入到数据库中,否则会回滚
 
     //通过动态代理实现接口 ,用动态代理对象去帮我们执行SQL
     //这里生成mapper实际类型是org.apache.ibatis.binding.MapperProxy
     DemoMapper mapper = sqlSession.getMapper(DemoMapper.class);
-    String projId="0124569b738e405fb20b68bfef37f487";
-    String sectionName="标段";
-    //Integer deptNum=10;
-    //String dName="T";
-    //List<ProjInfo> projInfos = mapper.selectAll(projId, sectionName);
+    Integer deptNum=10;
+    dName="T";
     //这里用生成的动态代理对象执行
-    //DeptInfo deptInfo = mapper.selectOne(deptNum, dName);
-    //System.out.println(projInfos);
+    DeptInfo deptInfo = mapper.selectOne(deptNum, dName);
+    System.out.println(deptInfo);
+    sqlSession.commit();
+    sqlSession.close();
+
+
+
+
+    /*String projId="0124569b738e405fb20b68bfef37f487";
+    String sectionName="标段";
+    List<ProjInfo> projInfos = mapper.selectAll(projId, sectionName);*/
 
   }
 

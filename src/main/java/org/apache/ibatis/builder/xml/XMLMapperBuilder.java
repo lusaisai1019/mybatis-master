@@ -121,7 +121,7 @@ public class XMLMapperBuilder extends BaseBuilder {
       cacheElement(context.evalNode("cache"));
       parameterMapElement(context.evalNodes("/mapper/parameterMap"));
       resultMapElements(context.evalNodes("/mapper/resultMap"));//解析resultMap标签
-      sqlElement(context.evalNodes("/mapper/sql"));
+      sqlElement(context.evalNodes("/mapper/sql"));//解析sql标签
       buildStatementFromContext(context.evalNodes("select|insert|update|delete"));//这里四种标签一起解析,所以效果一样
     } catch (Exception e) {
       throw new BuilderException("Error parsing Mapper XML. The XML location is '" + resource + "'. Cause: " + e, e);

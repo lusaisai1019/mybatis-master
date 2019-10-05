@@ -93,15 +93,15 @@ public class XMLConfigBuilder extends BaseBuilder {
     this.parser = parser;
   }
 
-  //外部调用此方法对mybatis配置文件进行解析
+  //调用此方法对mybatis配置文件进行解析
   public Configuration parse() {
-    //parsed默认为false,配置文件只读取一次,如果为true,读取多次的时候就抛一个异常
+    //注意:parsed默认为false,配置文件读取非常消耗资源,因此这里只读取一次,如果读取过则将parsed的值改为true,再次读取的时候就抛一个异常
     if (parsed) {
       throw new BuilderException("Each XMLConfigBuilder can only be used once.");
     }
     //在这里将parsed的值改为true
     parsed = true;
-    //从配置文件configuration标签开始解析,具体解析过程就不看了
+    //从配置文件configuration标签开始解析,具体解析过程在下面
     parseConfiguration(parser.evalNode("/configuration"));
     //返回Configuration对象用于存储mybatis配置文件信息
     return configuration;
@@ -112,7 +112,9 @@ public class XMLConfigBuilder extends BaseBuilder {
     try {
       //issue #117 read properties first,这里先读取properties标签,也就是数据库配置
       //我们在configuration下面能配置的节点为以下10个节点
+      //properties标签这里一般配置数据源
       propertiesElement(root.evalNode("properties"));
+      //settings标签可以配置缓存,执行器等信息
       Properties settings = settingsAsProperties(root.evalNode("settings"));
       loadCustomVfs(settings);
       loadCustomLogImpl(settings);
@@ -132,10 +134,13 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  //解析settings标签,返回Properties对象
   private Properties settingsAsProperties(XNode context) {
+    //如果没有settings标签,给一个默认值
     if (context == null) {
       return new Properties();
     }
+    //如果有settings标签,解析
     Properties props = context.getChildrenAsProperties();
     // Check that all settings are known to the configuration class
     MetaClass metaConfig = MetaClass.forClass(Configuration.class, localReflectorFactory);
@@ -175,12 +180,6 @@ public class XMLConfigBuilder extends BaseBuilder {
           String typeAliasPackage = child.getStringAttribute("name");
           configuration.getTypeAliasRegistry().registerAliases(typeAliasPackage);
         } else {//一个一个解析
-          /*
-              <typeAliases>
-                   <!--alias表示别名，type表示类的全路径-->
-                  <typeAlias  alias="User" type="com.tianshouzhi.mybatis.quickstart.domain.User"/>
-              </typeAliases>
-          */
           String alias = child.getStringAttribute("alias");
           String type = child.getStringAttribute("type");
           try {
@@ -411,12 +410,12 @@ public class XMLConfigBuilder extends BaseBuilder {
     if (parent != null) {
       // 解析mapper标签
       for (XNode child : parent.getChildren()) {
-        //解析package子标签
+        //如果mappers下面的子标签是package标签
         if ("package".equals(child.getName())) {
           String mapperPackage = child.getStringAttribute("name");
           configuration.addMappers(mapperPackage);
           //解析mapper子标签
-        } else {
+        } else {//如果mappers下面的子标签 不是package标签
           //mapper子标签有三种配置方式
           String resource = child.getStringAttribute("resource");
           String url = child.getStringAttribute("url");

@@ -83,7 +83,7 @@ public class SqlSessionFactoryBuilder {
   //就是这个方法,注意后面两个参数均为空
   public SqlSessionFactory build(InputStream inputStream, String environment, Properties properties) {
     try {
-      //XMLConfigBuilder看这个名字就是对mybatis的配置文件进行解析的类,现在他还是一个初始化对象,没有开始解析
+      //XMLConfigBuilder看这个名字就是对mybatis的配置文件进行解析的类,现在他还是一个初始化对象,没有开始解析.用的是java的dom解析
       XMLConfigBuilder parser = new XMLConfigBuilder(inputStream, environment, properties);
       //这个就是读取方法,parser.parse()返回一个Configuration对象,该对象将存放读取配置文件的信息
       //build(parser.parse())传入一个Configuration对象,并使用多态返回SqlSessionFactory接口的实体类DefaultSqlSessionFactory

@@ -72,8 +72,10 @@ public class PropertyParser {
       return (variables == null) ? defaultValue : variables.getProperty(key, defaultValue);
     }
 
+
     @Override
     public String handleToken(String content) {
+      //variables就是数据库Properties文件信息
       if (variables != null) {
         String key = content;
         if (enableDefaultValue) {
